@@ -1,0 +1,28 @@
+[project]
+name = "chess-support-mcp"
+version = "0.1.0"
+description = "MCP server providing tools to manage and inspect a chess game (no move suggestions)."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "mcp>=1.2.0",
+    "chess>=1.10.0",
+]
+
+[project.scripts]
+chess-support-mcp = "chess_support_mcp.server:main"
+
+[build-system]
+requires = ["uv_build>=0.8.3,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.2",
+    "pytest-anyio>=0.0.0",
+    "trio>=0.26",
+]

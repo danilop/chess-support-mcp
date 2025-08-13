@@ -24,7 +24,14 @@ class GameState:
         self.san_history.clear()
 
     def add_move_uci(self, uci: str) -> Dict[str, Any]:
-        move = chess.Move.from_uci(uci)
+        try:
+            move = chess.Move.from_uci(uci)
+        except Exception as exc:  # noqa: BLE001
+            return {
+                "accepted": False,
+                "reason": "parse_error",
+                "parse_error": str(exc),
+            }
         if move not in self.board.legal_moves:
             return {
                 "accepted": False,
@@ -125,7 +132,7 @@ def create_or_reset_game() -> Dict[str, Any]:
     - ok: boolean
     - status: object with the current position metadata:
       - fen: string (Forsyth–Edwards Notation)
-      - side_to_move/turn: "white" | "black"
+      - side_to_move: "white" | "black"
       - fullmove_number: int
       - halfmove_clock: int
       - ply_count: int (number of half-moves made)
@@ -162,7 +169,7 @@ def get_status() -> Dict[str, Any]:
     """Get current position metadata for model-friendly planning.
 
     Returns (in result):
-    - fen, side_to_move, turn, fullmove_number, halfmove_clock, ply_count
+    - fen, side_to_move, fullmove_number, halfmove_clock, ply_count
     - castling_rights, en_passant_square
     - last_move_uci, last_move_san, who_moved_last
     - is_check, is_game_over, result
@@ -283,6 +290,35 @@ def board_ascii() -> str:
     """
 
     return _GAME.ascii_board()
+
+
+@server.tool()
+def board_unicode(
+    invert_color: bool = False,
+    borders: bool = False,
+    empty_square: str = "⭘",
+    white_at_bottom: bool = True,
+) -> str:
+    """Return a Unicode representation of the board with piece glyphs.
+
+    Parameters:
+    - invert_color: invert Unicode piece glyph color style
+    - borders: add borders and coordinate margin
+    - empty_square: character for empty squares (default ⭘)
+    - white_at_bottom: True shows White at bottom; False flips orientation
+
+    Notes:
+    - Great for human display in chats/terminals; use ASCII as fallback if fonts are limited.
+    - For model reasoning, prefer get_status().pieces.
+    """
+
+    orientation = chess.WHITE if white_at_bottom else chess.BLACK
+    return _GAME.board.unicode(
+        invert_color=invert_color,
+        borders=borders,
+        empty_square=empty_square,
+        orientation=orientation,
+    )
 
 
 # Simple board color themes (designed for good contrast). Extendable for future piece themes.

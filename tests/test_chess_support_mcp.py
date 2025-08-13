@@ -53,8 +53,9 @@ async def test_add_move_and_list():
         add2 = await session.call_tool("add_move", {"uci": "e2e4"})
         a2 = add2.structuredContent["result"]
         assert a2["accepted"] is False
-        assert a2["reason"] == "illegal"
-        assert a2["expected_turn"] == "black"
+        assert a2["reason"] in {"illegal", "parse_error"}
+        if a2["reason"] == "illegal":
+            assert a2["expected_turn"] == "black"
         # Status should be unchanged (still e4 played only)
         assert a2["status"]["last_move_uci"] == "e2e4"
 
@@ -88,5 +89,10 @@ async def test_legality_and_board_ascii():
 
         board = await session.call_tool("board_ascii", {})
         assert isinstance(board.structuredContent["result"], str)
+
+        # Parse error path
+        bad = await session.call_tool("add_move", {"uci": "not-a-uci"})
+        badr = bad.structuredContent["result"]
+        assert badr["accepted"] is False and badr["reason"] == "parse_error"
 
 

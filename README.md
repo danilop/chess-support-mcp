@@ -128,14 +128,16 @@ Claude Desktop configuration (in its JSON settings), using `mcpServers`:
 ### Tools (Methods)
 
 - `create_or_reset_game()` → Reset to initial position. Returns `status` (with `pieces` map), and `moves`.
-- `get_status()` → Returns FEN; `side_to_move` and `turn` (white/black); `fullmove_number`; `halfmove_clock`; `ply_count`; `last_move_uci`; `last_move_san`; `who_moved_last`; check flags; `is_game_over`; and `result` when over.
-- `add_move(uci: str)` → Apply a move if legal (e.g., `e2e4`, `g1f3`, promotion like `e7e8q`). Returns acceptance, `reason` for failures (including `expected_turn`); updated FEN, SAN, flags, and move history.
+- `get_status()` → Returns FEN; `side_to_move` (white/black); `fullmove_number`; `halfmove_clock`; `ply_count`; `last_move_uci`; `last_move_san`; `who_moved_last`; check flags; `is_game_over`; `result` when over; and a `pieces` map for machine reasoning.
+- `add_move(uci: str)` → Apply a move if legal (e.g., `e2e4`, `g1f3`, promotion like `e7e8q`). Returns `{ accepted, status }` and, on success, also `moves` and `moves_detailed`. On failure returns `{ accepted:false, reason:"illegal"|"parse_error", expected_turn? }` with `status` reflecting the unchanged position.
 - `is_legal(uci: str)` → Check legality of a UCI move in the current position.
 - `list_moves()` → All moves in UCI made so far.
 - `list_moves_detailed()` → All moves with `ply`, `side`, `uci`, `san`.
 - `last_moves(n: int=1)` → Last N moves in UCI.
 - `last_moves_detailed(n: int=1)` → Last N moves with `ply`, `side`, `uci`, `san`.
 - `board_ascii()` → ASCII board (optional, human-oriented). The normal API returns machine-friendly JSON in `status.pieces`.
+- `board_unicode(invert_color=False, borders=False, empty_square="⭘", white_at_bottom=True)` → Unicode board with piece glyphs (human-oriented).
+- `board_svg(theme="classic", size=480, coordinates=True, highlight_last_move=True, highlight_check=True)` → SVG image output with `mimeType: image/svg+xml`.
 
 ### API design notes
 

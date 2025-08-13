@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import Any, Dict, List
 
 import chess
-import chess.svg
 from mcp.server.fastmcp import FastMCP
 
 
@@ -292,103 +291,7 @@ def board_ascii() -> str:
     return _GAME.ascii_board()
 
 
-@server.tool()
-def board_unicode(
-    invert_color: bool = False,
-    borders: bool = False,
-    empty_square: str = "⭘",
-    white_at_bottom: bool = True,
-) -> str:
-    """Return a Unicode representation of the board with piece glyphs.
-
-    Parameters:
-    - invert_color: invert Unicode piece glyph color style
-    - borders: add borders and coordinate margin
-    - empty_square: character for empty squares (default ⭘)
-    - white_at_bottom: True shows White at bottom; False flips orientation
-
-    Notes:
-    - Great for human display in chats/terminals; use ASCII as fallback if fonts are limited.
-    - For model reasoning, prefer get_status().pieces.
-    """
-
-    orientation = chess.WHITE if white_at_bottom else chess.BLACK
-    return _GAME.board.unicode(
-        invert_color=invert_color,
-        borders=borders,
-        empty_square=empty_square,
-        orientation=orientation,
-    )
-
-
-# Simple board color themes (designed for good contrast). Extendable for future piece themes.
-_BOARD_THEMES: Dict[str, Dict[str, str]] = {
-    "classic": {
-        "square light": "#f0d9b5",
-        "square dark": "#b58863",
-        "coord": "#000000",
-    },
-    "blue": {
-        "square light": "#eaeef2",
-        "square dark": "#769656",
-        "coord": "#1f2937",
-    },
-    "high-contrast": {
-        "square light": "#ffffff",
-        "square dark": "#000000",
-        "coord": "#000000",
-    },
-}
-
-
-@server.tool()
-def board_svg(
-    theme: str = "classic",
-    size: int = 480,
-    coordinates: bool = True,
-    highlight_last_move: bool = True,
-    highlight_check: bool = True,
-) -> Dict[str, Any]:
-    """Render the current position as an SVG image (image/svg+xml).
-
-    Parameters:
-    - theme: one of [classic, blue, high-contrast]
-    - size: board size in px
-    - coordinates: include file/rank coordinates
-    - highlight_last_move: highlight the most recent move if available
-    - highlight_check: highlight the checked king if in check
-
-    Returns (in result):
-    - { mimeType: "image/svg+xml", svg: string, theme: string, size: int }
-
-    Notes:
-    - Intended for human display in UIs/logs/chat. For reasoning, prefer get_status().pieces.
-    - Piece style theming is reserved for future enhancements; current rendering uses python-chess built-in vectors.
-    """
-
-    colors = _BOARD_THEMES.get(theme, _BOARD_THEMES["classic"]).copy()
-    lastmove = _GAME.board.move_stack[-1] if (highlight_last_move and _GAME.board.move_stack) else None
-    check_square = None
-    if highlight_check and _GAME.board.is_check():
-        # The side to move is in check
-        king_sq = _GAME.board.king(_GAME.board.turn)
-        if king_sq is not None:
-            check_square = king_sq
-
-    svg = chess.svg.board(
-        board=_GAME.board,
-        size=size,
-        coordinates=coordinates,
-        colors=colors,
-        lastmove=lastmove,
-        check=check_square,
-    )
-    return {
-        "mimeType": "image/svg+xml",
-        "svg": svg,
-        "theme": theme,
-        "size": size,
-    }
+ 
 
 
 def main() -> None:

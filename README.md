@@ -136,8 +136,6 @@ Claude Desktop configuration (in its JSON settings), using `mcpServers`:
 - `last_moves(n: int=1)` → Last N moves in UCI.
 - `last_moves_detailed(n: int=1)` → Last N moves with `ply`, `side`, `uci`, `san`.
 - `board_ascii()` → ASCII board (optional, human-oriented). The normal API returns machine-friendly JSON in `status.pieces`.
-- `board_unicode(invert_color=False, borders=False, empty_square="⭘", white_at_bottom=True)` → Unicode board with piece glyphs (human-oriented).
-- `board_svg(theme="classic", size=480, coordinates=True, highlight_last_move=True, highlight_check=True)` → SVG image output with `mimeType: image/svg+xml`.
 
 ### API design notes
 

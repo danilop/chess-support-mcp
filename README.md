@@ -1,6 +1,6 @@
 ## Chess Support MCP Server
 
-An MCP server that manages the state of a single chess game for LLMs/agents. It intentionally does not suggest moves. Instead, it provides tools to:
+An MCP server that manages the state of a chess game for LLMs/agents. It intentionally does not suggest moves. Instead, it provides tools to:
 
 - Create/reset game
 - Add a move (UCI)

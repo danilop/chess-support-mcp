@@ -15,22 +15,48 @@ An MCP server that manages the state of a single chess game for LLMs/agents. It 
 - Python 3.13+
 - uv package manager
 
-### Install and run with uvx
+### Run via uvx directly from GitHub (no local checkout)
 
-You can run directly without cloning by pointing uvx to the repo, or run locally within this project.
+You can run this MCP server without cloning by using `uvx` with a Git URL. Replace placeholders with your repo info and optional tag/commit.
 
-Local development:
+Generic MCP config (Inspector-style):
 
-```bash
-uv sync
-uv run chess-support-mcp
+```json
+{
+  "servers": {
+    "chess-support-mcp": {
+      "transport": {
+        "type": "stdio",
+        "command": "uvx",
+        "args": [
+          "--from",
+          "git+https://github.com/danilop/chess-support-mcp.git",
+          "chess-support-mcp"
+        ]
+      }
+    }
+  }
+}
 ```
 
-This starts the MCP server over stdio and waits for a client.
+Claude Desktop `mcpServers` example:
 
-### Interacting via an MCP client
+```json
+{
+  "mcpServers": {
+    "chess-support-mcp": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/danilop/chess-support-mcp.git",
+        "chess-support-mcp"
+      ]
+    }
+  }
+}
+```
 
-You can use the MCP Python client in your own code or an MCP inspector. The test suite demonstrates end-to-end usage via stdio.
+The first run may take longer while `uvx` resolves and builds the package; subsequent runs use cache.
 
 ### Configure as a local MCP server (JSON)
 
@@ -99,62 +125,6 @@ Claude Desktop configuration (in its JSON settings), using `mcpServers`:
 }
 ```
 
-Notes:
-- The server communicates via stdio, so no host/port is required.
-- You can add environment variables with an `env` object if needed.
-
-### Run via uvx directly from GitHub (no local checkout)
-
-You can run this MCP server without cloning by using `uvx` with a Git URL. Replace placeholders with your repo info and optional tag/commit.
-
-Generic MCP config (Inspector-style):
-
-```json
-{
-  "servers": {
-    "chess-support-mcp": {
-      "transport": {
-        "type": "stdio",
-        "command": "uvx",
-        "args": [
-          "--from",
-          "git+https://github.com/<OWNER>/<REPO>.git@<TAG_OR_COMMIT>",
-          "chess-support-mcp"
-        ]
-      }
-    }
-  }
-}
-```
-
-Claude Desktop `mcpServers` example:
-
-```json
-{
-  "mcpServers": {
-    "chess-support-mcp": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/<OWNER>/<REPO>.git@<TAG_OR_COMMIT>",
-        "chess-support-mcp"
-      ]
-    }
-  }
-}
-```
-
-Tips:
-- Omit the `@<TAG_OR_COMMIT>` to use the default branch HEAD, or pin to a release tag for stability (recommended).
-- The first run may take longer while `uvx` resolves and builds the package; subsequent runs use cache.
-
-### Build with uv's build backend
-
-```bash
-uv build
-ls dist/
-```
-
 ### Tools (Methods)
 
 - `create_or_reset_game()` → Reset to initial position. Returns `status` (with `pieces` map), and `moves`.
@@ -175,7 +145,7 @@ ls dist/
 
 ### Notes
 
-- The server maintains one in-memory game. If you need multiple parallel games, a future enhancement could add named sessions.
+- The server maintains one in-memory game.
 - The server does not provide hints or best moves.
  
 ### Development
